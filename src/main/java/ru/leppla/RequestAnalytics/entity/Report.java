@@ -16,7 +16,9 @@ public class Report {
     private LocalDateTime requestFrom;
     private LocalDateTime requestTo;
 
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private ReportStatus status;
+
     private String filePath;
 
     @Column(name = "created_at")
@@ -56,8 +58,13 @@ public class Report {
     public LocalDateTime getRequestTo() { return requestTo; }
     public void setRequestTo(LocalDateTime requestTo) { this.requestTo = requestTo; }
 
-    public String getStatus() { return status; }
-    public void setStatus(String status) { this.status = status; }
+    public ReportStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(ReportStatus status) {
+        this.status = status;
+    }
 
     public String getFilePath() { return filePath; }
     public void setFilePath(String filePath) { this.filePath = filePath; }

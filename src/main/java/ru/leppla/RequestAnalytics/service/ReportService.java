@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.leppla.RequestAnalytics.dto.ReportRequestDTO;
 import ru.leppla.RequestAnalytics.dto.RequestSummaryFilterDTO;
 import ru.leppla.RequestAnalytics.entity.Report;
+import ru.leppla.RequestAnalytics.entity.ReportStatus;
 import ru.leppla.RequestAnalytics.entity.RequestSummaryView;
 import ru.leppla.RequestAnalytics.repository.ReportRepository;
 import ru.leppla.RequestAnalytics.repository.RequestSummaryViewRepository;
@@ -49,7 +50,7 @@ public class ReportService {
         report.setRequestTo(dto.getRequestTo());
         report.setMinHeaders(dto.getMinHeaders());
         report.setMinParams(dto.getMinParams());
-        report.setStatus("PENDING");
+        report.setStatus(ReportStatus.PENDING);
         report.setCreatedAt(LocalDateTime.now());
 
         reportRepository.save(report);
@@ -61,18 +62,18 @@ public class ReportService {
     public void generateReportAsync(Long reportId) {
         Report report = reportRepository.findById(reportId).orElseThrow();
 
-        if ("COMPLETED".equalsIgnoreCase(report.getStatus())) return;
+        if (report.getStatus() == ReportStatus.COMPLETED) return;
 
         try {
             List<String> reportData = generateReportData(report);
             String filePath = generateCsvFile(reportData);
 
             report.setFilePath(filePath);
-            report.setStatus("COMPLETED");
+            report.setStatus(ReportStatus.COMPLETED);
             reportRepository.save(report);
 
         } catch (Exception e) {
-            report.setStatus("FAILED");
+            report.setStatus(ReportStatus.FAILED);
             reportRepository.save(report);
             e.printStackTrace();
         }
@@ -142,7 +143,7 @@ public class ReportService {
         Report report = reportRepository.findById(reportId)
                 .orElseThrow(() -> new RuntimeException("Отчен не найден."));
 
-        if (!"COMPLETED".equalsIgnoreCase(report.getStatus()))
+        if (report.getStatus() != ReportStatus.COMPLETED)
             throw new RuntimeException("Отчет еще не завершен.");
 
         RequestSummaryFilterDTO filter = new RequestSummaryFilterDTO();

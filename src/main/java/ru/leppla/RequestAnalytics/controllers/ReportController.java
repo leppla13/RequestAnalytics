@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.leppla.RequestAnalytics.dto.ReportRequestDTO;
 import ru.leppla.RequestAnalytics.entity.Report;
+import ru.leppla.RequestAnalytics.entity.ReportStatus;
 import ru.leppla.RequestAnalytics.entity.RequestSummaryView;
 import ru.leppla.RequestAnalytics.service.ReportService;
 
@@ -38,7 +39,7 @@ public class ReportController {
     @GetMapping("/{id}")
     public ResponseEntity<?> getReportResult(@PathVariable Long id) {
         Report report = reportService.getReportResult(id);
-        if ("COMPLETED".equals(report.getStatus())) {
+        if (report.getStatus() == ReportStatus.COMPLETED) {
 
             try {
                 return ResponseEntity.ok().body(Files.readAllBytes(Paths.get(report.getFilePath())));
