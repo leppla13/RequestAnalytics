@@ -1,5 +1,7 @@
 package ru.leppla.RequestAnalytics.controllers;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
@@ -20,6 +22,8 @@ import java.nio.file.Paths;
 public class ReportController {
 
     private final ReportService reportService;
+
+    private static final Logger logger = LoggerFactory.getLogger(ReportController.class);
 
     public ReportController(ReportService reportService) {
         this.reportService = reportService;
@@ -44,6 +48,7 @@ public class ReportController {
             try {
                 return ResponseEntity.ok().body(Files.readAllBytes(Paths.get(report.getFilePath())));
             } catch (IOException e) {
+                logger.error("Ошибка при чтении CSV-файла отчета", e);
                 throw new RuntimeException(e);
             }
         }

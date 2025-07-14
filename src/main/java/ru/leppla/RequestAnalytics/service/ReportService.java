@@ -1,5 +1,7 @@
 package ru.leppla.RequestAnalytics.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -32,6 +34,9 @@ public class ReportService {
     private final ReportRepository reportRepository;
     private final RequestSummaryViewRepository requestSummaryRepo;
     private final RequestSummarySpecification specBuilder;
+
+    private static final Logger logger = LoggerFactory.getLogger(ReportService.class);
+
 
     @Autowired
     public ReportService(ReportRepository reportRepository, RequestSummaryViewRepository requestSummaryRepo,
@@ -124,6 +129,7 @@ public class ReportService {
             }
 
         } catch (IOException e) {
+            logger.error("Ошибка записи CSV-файла отчета", e);
             throw new RuntimeException("Не удалось записать файл отчета.", e);
         }
 
@@ -136,15 +142,23 @@ public class ReportService {
 
     public Report getReportResult(Long id) {
         return reportRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Отчет с таким id не найден: " + id));
+                .orElseThrow(() -> {
+                    logger.warn("Отчет с id {} не найден", id);
+                    return new RuntimeException("Отчет с таким id не найден: " + id);
+                });
     }
 
     public Page<RequestSummaryView> getReportPaged(Long reportId, Pageable pageable) {
         Report report = reportRepository.findById(reportId)
-                .orElseThrow(() -> new RuntimeException("Отчен не найден."));
+                .orElseThrow(() -> {
+                    logger.warn("Отчет с id {} не найден", reportId);
+                    return new RuntimeException("Отчет не найден.");
+                });
 
-        if (report.getStatus() != ReportStatus.COMPLETED)
+        if (report.getStatus() != ReportStatus.COMPLETED) {
+            logger.info("Попытка доступа к еще не завершенному отчету с id {}", reportId);
             throw new RuntimeException("Отчет еще не завершен.");
+        }
 
         RequestSummaryFilterDTO filter = new RequestSummaryFilterDTO();
         filter.setHost(report.getHost());

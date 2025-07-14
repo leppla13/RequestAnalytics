@@ -1,5 +1,7 @@
 package ru.leppla.RequestAnalytics.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import ru.leppla.RequestAnalytics.dto.JsonRequestDTO;
 import ru.leppla.RequestAnalytics.dto.TextRequestDTO;
@@ -16,6 +18,8 @@ public class RequestService {
 
     private final RequestRepository requestRepository;
 
+    private static final Logger logger = LoggerFactory.getLogger(RequestService.class);
+
     public RequestService(RequestRepository requestRepository) {
         this.requestRepository = requestRepository;
     }
@@ -24,7 +28,7 @@ public class RequestService {
         URI uri = new URI(dto.getUrl());
 
         Request request = new Request();
-        request.setUrl(uri.getScheme() + "://" + uri.getHost());
+        request.setUrl(uri.getHost());
         request.setPath(uri.getPath());
         request.setBody(null);
         request.setRequestTime(LocalDateTime.now());
@@ -37,7 +41,7 @@ public class RequestService {
             URI uri = new URI(dto.getUrl());
 
             Request request = new Request();
-            request.setUrl(uri.getScheme() + "://" + uri.getHost());
+            request.setUrl(uri.getHost());
             request.setPath(dto.getPath());
             request.setBody(dto.getBody());
             request.setRequestTime(LocalDateTime.now());
@@ -64,6 +68,7 @@ public class RequestService {
 
             requestRepository.save(request);
         } catch (URISyntaxException e) {
+            logger.warn("Некорректный URL в JSON-запросе: {}", dto.getUrl(), e);
             throw new RuntimeException("Недопустимый URL-адрес в запросе JSON: " + dto.getUrl(), e);
         }
     }

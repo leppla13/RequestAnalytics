@@ -1,6 +1,0 @@
-id,host,path,avgHeaders,avgParams,requestTime
-10,https://example.com,/project/test,0,00,0,00,2025-07-09T11:53:26.457168
-11,https://example.com,/project/test,2,00,2,00,2025-07-09T11:54:20.838346
-14,https://example.com,/project/test,2,00,2,00,2025-07-11T09:56:06.727488
-15,https://example.com,/project/test,0,00,0,00,2025-07-11T09:59:25.666793
-16,https://example.com,/project/test,2,00,2,00,2025-07-11T09:59:39.094083

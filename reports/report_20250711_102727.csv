@@ -1,3 +1,0 @@
-id,host,path,avgHeaders,avgParams,requestTime
-19,https://ex.com,/xe,0,00,0,00,2025-07-11T10:25:35.873052
-20,https://ex.com,/xe,2,00,2,00,2025-07-11T10:25:50.595853
