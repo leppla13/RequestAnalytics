@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+          http://www.liquibase.org/xml/ns/dbchangelog
+          http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <changeSet id="create-request-summary-view" author="leppla" dbms="postgresql">
+        <sql>
+            CREATE OR REPLACE VIEW request_summary_view AS
+            SELECT
+            row_number() OVER () AS id,
+            LOWER(sub.url) AS host,
+            sub.path AS path,
+            MAX(sub.request_time) AS request_time,
+            ROUND(AVG(sub.header_count), 2) AS avg_headers,
+            ROUND(AVG(sub.param_count), 2) AS avg_params
+            FROM (
+            SELECT
+            r.id,
+            r.url,
+            r.path,
+            r.request_time,
+            (SELECT COUNT(*) FROM headers h WHERE h.request_id = r.id) AS header_count,
+            (SELECT COUNT(*) FROM params p WHERE p.request_id = r.id) AS param_count
+            FROM requests r
+            ) AS sub
+            GROUP BY LOWER(sub.url), sub.path;
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>
